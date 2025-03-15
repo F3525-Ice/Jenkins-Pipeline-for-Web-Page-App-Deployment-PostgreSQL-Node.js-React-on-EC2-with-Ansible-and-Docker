@@ -14,14 +14,10 @@ systemctl start docker
 systemctl enable docker
 usermod -a -G docker ec2-user
 usermod -a -G docker jenkins
-cp /lib/systemd/system/docker.service /lib/systemd/system/docker.service.bak
-sed -i 's/^ExecStart=.*/ExecStart=\/usr\/bin\/dockerd -H tcp:\/\/127.0.0.1:2376 -H unix:\/\/\/var\/run\/docker.sock/g' /lib/systemd/system/docker.service
 systemctl daemon-reload
 systemctl restart jenkins
-curl -SL https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose
 dnf install -y ansible
 dnf install -y pip
 pip install boto3
-wget https://releases.hashicorp.com/terraform/1.8.4/terraform_1.8.4_linux_amd64.zip
-unzip terraform_1.8.4_linux_amd64.zip -d /usr/local/bin
+wget https://releases.hashicorp.com/terraform/1.9.5/terraform_1.9.5_linux_amd64.zip
+unzip terraform_1.9.5_linux_amd64.zip -d /usr/local/bin
