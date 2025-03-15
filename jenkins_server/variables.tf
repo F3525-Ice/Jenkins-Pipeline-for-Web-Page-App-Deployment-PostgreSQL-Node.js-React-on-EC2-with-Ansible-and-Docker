@@ -1,5 +1,5 @@
 variable "mykey" {
-  default = "Secondkey"
+  default = "...."
 }
 
 variable "git-token" {
