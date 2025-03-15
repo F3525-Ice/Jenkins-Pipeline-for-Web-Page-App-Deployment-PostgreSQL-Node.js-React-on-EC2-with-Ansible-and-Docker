@@ -6,7 +6,7 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "jenkins-project-backend-calimero"
+    bucket = "jenkins-project-backend-rcp"
     key = "backend/tf-backend-jenkins.tfstate"
     region = "us-east-1"
   }
@@ -21,10 +21,10 @@ variable "tags" {
 }
 
 resource "aws_instance" "managed_nodes" {
-  ami = "ami-0fe630eb857a6ec83"
+  ami = "ami-0583d8c7a9c35822c"
   count = 3
   instance_type = "t2.micro" 
-  key_name = "Seconkey"
+  key_name = "project-208"
   vpc_security_group_ids = [aws_security_group.tf-sec-gr.id]
   iam_instance_profile = aws_iam_instance_profile.ec2-profile.name
   tags = {
@@ -40,25 +40,30 @@ resource "aws_instance" "managed_nodes" {
 
 resource "aws_iam_role" "aws_access" {
   name = "awsrole-project"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Sid    = ""
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
       },
-    ]
-  })
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"]
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
 
+resource "aws_iam_role_policy_attachment" "ecr_full_access" {
+  role       = aws_iam_role.aws_access.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
 }
 
 resource "aws_iam_instance_profile" "ec2-profile" {
-  name = "jenkins-project-profile-2"
+  name = "jenkins-project-profile"
   role = aws_iam_role.aws_access.name
 }
 
