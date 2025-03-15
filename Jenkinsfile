@@ -53,9 +53,9 @@ pipeline{
                 sh 'cat ./nodejs/server/.env'
                 sh 'envsubst < react-env-template > ./react/client/.env'
                 sh 'cat ./react/client/.env'
-                sh 'docker build --force-rm -t "$ECR_REGISTRY/$APP_REPO_NAME:postgre" -f ./postgresql/dockerfile-postgresql .'
-                sh 'docker build --force-rm -t "$ECR_REGISTRY/$APP_REPO_NAME:nodejs" -f ./nodejs/dockerfile-nodejs .'
-                sh 'docker build --force-rm -t "$ECR_REGISTRY/$APP_REPO_NAME:react" -f ./react/dockerfile-react .'
+                sh 'docker build -t "$ECR_REGISTRY/$APP_REPO_NAME:postgre" -f ./postgresql/dockerfile-postgresql .'
+                sh 'docker build -t "$ECR_REGISTRY/$APP_REPO_NAME:nodejs" -f ./nodejs/dockerfile-nodejs .'
+                sh 'docker build -t "$ECR_REGISTRY/$APP_REPO_NAME:react" -f ./react/dockerfile-react .'
                 sh 'docker image ls'
             }
         }
@@ -87,7 +87,7 @@ pipeline{
                 sh 'ansible --version'
                 sh 'sleep 180'
                 sh 'ansible-inventory --graph'
-                ansiblePlaybook credentialsId: 'project-208', disableHostKeyChecking: true, installation: 'ansible', inventory: 'inventory_aws_ec2.yml', playbook: 'docker-project.yml'
+                ansiblePlaybook credentialsId: 'project-208-rcp', disableHostKeyChecking: true, installation: 'ansible', inventory: 'inventory_aws_ec2.yml', playbook: 'docker-project.yml'
              }
         }
 
@@ -114,13 +114,6 @@ pipeline{
             echo 'Deleting all local images'
             sh 'docker image prune -af'
         }
-
-        success {
-             script {
-             slackSend channel: '#class-chat', color: '#439FE0', message: 'cw-todo-app is ready and pipeline passed succesfully', teamDomain: 'devops16tr', tokenCredentialId: 'jenkins-slack'
-                }
-         }
-
 
         failure {
 
